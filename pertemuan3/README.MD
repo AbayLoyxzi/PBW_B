@@ -1,78 +1,54 @@
-# Praktikum PBW - Pertemuan 3
+# Tugas 3 - Modifikasi Database Akademik
 
-## Isi folder
+## 1. Modifikasi SQL
 
-- `Pertemuan3_awal.sql` adalah salinan dump SQL yang diberikan sebelum dimodifikasi.
-- `Pertemuan3_modifikasi.sql` adalah file utama untuk diimpor dan dijalankan.
-- `screenshoot/` adalah tempat menyimpan screenshot asli yang kamu ambil sendiri.
+Database akademik pada `Pertemuan3_awal.sql` terdiri dari tabel `mahasiswa`, `dosen`, `mata_kuliah`, dan `krs`. Hasil modifikasi disimpan dalam `Pertemuan3_modifikasi.sql` dengan beberapa perubahan:
 
-## Ringkasan database
+1. **Status mahasiswa:** menambahkan kolom `status_aktif` dengan pilihan `aktif`, `cuti`, atau `lulus` dan nilai default `aktif`.
+2. **Pengaturan IPK:** mengubah kolom `ipk` menjadi `NOT NULL DEFAULT 0.00` serta mempertahankan batas IPK 0.00–4.00 yang sudah ada pada SQL awal.
+3. **Validasi semester:** menambahkan constraint `chk_krs_semester` untuk membatasi semester KRS dari 1 sampai 8.
+4. **Data dan query:** menambahkan contoh data dosen, mata kuliah, dan KRS, serta query untuk menampilkan mahasiswa aktif berdasarkan IPK dan menggabungkan data dari keempat tabel.
 
-Database akademik ini memiliki empat tabel yang saling terhubung:
+Hasil modifikasi menggunakan database `akademik_pertemuan3` agar terpisah dari database awal. Primary key, foreign key, dan unique key gabungan KRS yang sudah ada tetap dipertahankan.
 
-- `mahasiswa` menyimpan NIM, nama, email, program studi, angkatan, dan IPK.
-- `dosen` menyimpan NIDN, nama, dan email dosen.
-- `mata_kuliah` menyimpan kode, nama, jumlah SKS, dan dosen pengampu.
-- `krs` menghubungkan mahasiswa dengan mata kuliah pada semester dan tahun ajaran tertentu.
+## 2. Penjelasan 5 Bagian Kode Paling Penting
 
-Primary key memberi identitas unik untuk setiap baris. Foreign key menjaga agar KRS hanya merujuk mahasiswa dan mata kuliah yang tersedia. KRS juga memiliki unique key gabungan `nim`, `kode_mk`, `semester`, dan `tahun_ajaran`, sehingga mahasiswa tidak bisa mengambil mata kuliah yang sama dua kali pada periode yang sama.
+1. `CREATE DATABASE IF NOT EXISTS` dan `USE` menyiapkan serta memilih database `akademik_pertemuan3` sebagai tempat penyimpanan tabel dan data hasil modifikasi.
+2. `status_aktif ENUM('aktif','cuti','lulus') NOT NULL DEFAULT 'aktif'` menyediakan pilihan status mahasiswa dan memberi nilai `aktif` jika status tidak dicantumkan saat memasukkan data.
+3. `ipk DECIMAL(3,2) NOT NULL DEFAULT 0.00` mengatur IPK menjadi angka dengan dua digit desimal, tidak menerima `NULL`, dan menggunakan nilai 0.00 jika kolom tidak dicantumkan saat memasukkan data.
+4. `CHECK` pada `chk_mahasiswa_ipk` dan `chk_krs_semester` membatasi IPK ke rentang 0.00–4.00 serta semester ke rentang 1–8.
+5. `SELECT` bersama `WHERE` dan `ORDER BY` menampilkan mahasiswa aktif berdasarkan IPK tertinggi. Query berikutnya menggunakan `JOIN` dan `LEFT JOIN` untuk menampilkan KRS beserta nama mahasiswa, mata kuliah, dan dosen.
 
-## Modifikasi SQL
+## 3. Screenshot Sebelum dan Sesudah Modifikasi
 
-1. **Status mahasiswa:** kolom `status_aktif` bertipe `ENUM` menerima `aktif`, `cuti`, atau `lulus`. Nilai awalnya `aktif`.
-2. **Validasi IPK:** `ipk` sekarang wajib diisi, nilai awalnya `0.00`, dan dibatasi antara `0.00` sampai `4.00`.
-3. **Validasi semester:** constraint `chk_krs_semester` membatasi semester KRS dari 1 sampai 8.
-4. **Query hasil:** query pertama memfilter mahasiswa aktif dan mengurutkannya berdasarkan IPK. Query kedua menggabungkan data KRS, mahasiswa, mata kuliah, dan dosen.
+Screenshot berikut menunjukkan struktur tabel `mahasiswa` di phpMyAdmin sebelum dan sesudah modifikasi, berdasarkan `Pertemuan3_awal.sql` dan `Pertemuan3_modifikasi.sql`.
 
-Dump awal sudah memiliki kolom `ipk` dan unique key gabungan KRS. Karena itu, keduanya dipertahankan dan tidak dihitung sebagai modifikasi baru. File hasil memakai database baru bernama `akademik_pertemuan3`, bukan nama database pribadi dari dump sumber.
+### Struktur Tabel Sebelum Modifikasi
 
-## Cara menjalankan
+Database `akademik_sebelum` belum memiliki kolom `status_aktif`, dan kolom `ipk` masih menerima `NULL`.
+
+![Struktur tabel mahasiswa sebelum modifikasi](screenshoot/1_tabel_sebelum.png)
+
+### Struktur Tabel Sesudah Modifikasi
+
+Database `akademik_pertemuan3` memiliki kolom `status_aktif` dengan nilai default `aktif`, sedangkan kolom `ipk` menjadi `NOT NULL` dengan nilai default 0.00.
+
+![Struktur tabel mahasiswa sesudah modifikasi](screenshoot/2_tabel_sesudah.png)
+
+## 4. Validasi Data Akademik
+
+Kolom `ipk` tidak menerima `NULL` dan dibatasi antara 0.00–4.00, sedangkan semester KRS dibatasi antara 1–8 melalui `CHECK`. Kolom `status_aktif` menyediakan pilihan `aktif`, `cuti`, dan `lulus` melalui `ENUM`. Pada mode SQL non-strict seperti dalam file ini, nilai `ENUM` di luar daftar dapat dikonversi menjadi string kosong dengan peringatan, sehingga tidak selalu ditolak sebagai error.
+
+Foreign key menjaga agar data KRS merujuk mahasiswa dan mata kuliah yang terdaftar. Unique key `uq_krs` mencegah pengulangan kombinasi NIM, kode mata kuliah, semester, dan tahun ajaran yang sama.
+
+Referensi: [constraint MariaDB](https://mariadb.com/docs/server/reference/sql-statements/data-definition/constraint) dan [tipe data ENUM](https://mariadb.com/docs/server/reference/data-types/string-data-types/enum).
+
+## Menjalankan SQL
 
 1. Buka **XAMPP Control Panel**, lalu jalankan **Apache** dan **MySQL**.
-2. Buka browser ke `http://localhost/phpmyadmin`.
-3. Pilih tab **Import**, pilih `Pertemuan3_modifikasi.sql` dari folder ini, lalu tekan **Go/Kirim**. File SQL membuat database `akademik_pertemuan3` secara otomatis.
-4. Buka database `akademik_pertemuan3`. Pastikan empat tabel (`dosen`, `mahasiswa`, `mata_kuliah`, `krs`) terlihat.
-5. Buka tab **SQL** untuk menjalankan ulang query contoh di bagian akhir file. Query pertama menampilkan mahasiswa aktif; query kedua menampilkan hasil gabungan KRS dan tabel terkait.
+2. Buka [phpMyAdmin](http://localhost/phpmyadmin) di browser.
+3. Untuk menyiapkan database awal, buat database kosong bernama `akademik_sebelum`, pilih database tersebut, lalu buka tab **Import** dan impor `Pertemuan3_awal.sql`. File awal tidak memiliki perintah `CREATE DATABASE` atau `USE`, sehingga database harus dipilih terlebih dahulu.
+4. Untuk hasil modifikasi, kembali ke halaman utama phpMyAdmin, buka tab **Import**, lalu impor `Pertemuan3_modifikasi.sql`. File ini membuat dan memilih database `akademik_pertemuan3` secara otomatis.
+5. Buka tabel `mahasiswa` pada masing-masing database dan pilih tab **Structure/Struktur** untuk melihat perbedaannya. Query contoh di bagian akhir file modifikasi dapat dijalankan ulang melalui tab **SQL**.
 
-## Error dan perbaikannya
-
-Contoh error yang bisa direproduksi adalah **foreign key constraint fails / MariaDB error 1452**. Error ini terjadi jika baris KRS memakai NIM yang belum ada pada `mahasiswa` atau kode mata kuliah yang belum ada pada `mata_kuliah`.
-
-Untuk memunculkan error dengan aman, buka tab **SQL** dan jalankan:
-
-```sql
-INSERT INTO `krs` (`nim`,`kode_mk`,`semester`,`tahun_ajaran`,`nilai_huruf`)
-VALUES ('9999999','PBW301',1,'2026/2027','A');
-```
-
-Query tersebut ditolak karena NIM `9999999` belum terdaftar. Perbaikannya adalah memakai NIM dan kode mata kuliah yang sudah terdaftar, atau memasukkan data induk yang benar terlebih dahulu. Baris yang gagal tidak tersimpan. Coba cek data induk dengan:
-
-```sql
-SELECT `nim`, `nama` FROM `mahasiswa` WHERE `nim` = '2026001';
-SELECT `kode_mk`, `nama_mk` FROM `mata_kuliah` WHERE `kode_mk` = 'PBW301';
-```
-
-Catatan: bagian ini adalah simulasi penyebab error yang umum pada foreign key. Jika saat impor kamu melihat pesan error yang berbeda, catat pesan aslinya dan kirim ke aku agar README bisa disesuaikan dengan kejadian nyata.
-
-## Screenshot yang perlu kamu ambil
-
-Screenshot cukup **dua buah**, dan keduanya diambil dari tampilan tabel phpMyAdmin. Jangan screenshot kode atau pesan error. Simpan file PNG ke folder `screenshoot/` ini.
-
-| Nama file | Tampilan yang harus terlihat |
-| --- | --- |
-| `1_tabel_sebelum.png` | phpMyAdmin > database `akademik_sebelum` > tabel `mahasiswa` > tab **Structure/Struktur**. Pastikan kolom awal terlihat dan belum ada `status_aktif`. |
-| `2_tabel_sesudah.png` | phpMyAdmin > database `akademik_pertemuan3` > tabel `mahasiswa` > tab **Structure/Struktur**. Pastikan kolom `status_aktif` dan definisi IPK yang sudah dimodifikasi terlihat. |
-
-### Cara menyiapkan tampilan sebelum dan sesudah
-
-1. Di phpMyAdmin, buat database kosong bernama `akademik_sebelum`.
-2. Klik database `akademik_sebelum`, buka tab **Import**, pilih `Pertemuan3_awal.sql`, lalu tekan **Go/Kirim**. File awal tidak membuat database sendiri, jadi pilih database itu sebelum mengimpor.
-3. Buka tabel `mahasiswa` lalu tab **Structure/Struktur**. Ambil screenshot pertama sebagai `1_tabel_sebelum.png`.
-4. Impor `Pertemuan3_modifikasi.sql`. File ini membuat database terpisah `akademik_pertemuan3`.
-5. Buka database `akademik_pertemuan3`, pilih tabel `mahasiswa`, lalu tab **Structure/Struktur**. Ambil screenshot kedua sebagai `2_tabel_sesudah.png`.
-
-Ambil keduanya dengan **Win + Shift + S** dan simpan ke folder `screenshoot/`. Jangan mengimpor dump awal ke database yang sudah berisi data penting; gunakan database kosong `akademik_sebelum` khusus untuk perbandingan.
-
-## Materi yang dipakai
-
-Materi Pertemuan 3 membahas tabel, tipe data, primary key, foreign key, constraint, serta query SQL seperti `SELECT`, `WHERE`, dan `ORDER BY`. File ini menerapkannya pada skema akademik dan menampilkan hasil query melalui phpMyAdmin.
+Gunakan database kosong untuk impor pertama. `CREATE TABLE IF NOT EXISTS` tidak memperbarui struktur tabel yang sudah ada, sehingga mengimpor ulang file modifikasi bukan pengganti perubahan struktur dengan `ALTER TABLE`.
