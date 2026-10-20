@@ -163,10 +163,3 @@ Pada pengujian terpisah tersebut, data uji CRUD telah dihapus dan kondisi akhir 
 Sepuluh screenshot praktikum mendokumentasikan kode sebelum dan sesudah modifikasi, tampilan katalog, formulir dan hasil penambahan, filter kategori Novel, penolakan kode duplikat, serta keberhasilan setelah kode diperbaiki. Jumlah stok pada gambar konsisten: `17 + 16 = 33`, kemudian `33 + 3 = 36`. Screenshot tersebut mendukung hasil penambahan, filter, dan penanganan duplikat; pengujian edit dan hapus tercatat secara terpisah pada `VALIDASI.txt`.
 
 Validasi database mencakup UNIQUE kode, kategori ENUM, serta batas tahun 1900–2100 dan stok 0–999. Aplikasi menerapkan batas tahun yang lebih ketat, yaitu sampai tahun berjalan. Pengaturan ini tidak menimpa database akademik dari pertemuan sebelumnya.
-
-## Referensi
-
-- Materi praktikum yang diberikan: *Prak PBW ruangan AI pertemuan 5 dan 6.pdf*. Label internal slide masih tertulis Pertemuan 4; tugas disimpan pada Pertemuan5 sesuai permintaan.
-- Contoh program: `referensi/Pertemuan6ril.zip`.
-- [PHP Manual — MySQLi Prepared Statements](https://www.php.net/manual/en/mysqli.quickstart.prepared-statements.php).
-- [PHP Manual — htmlspecialchars](https://www.php.net/manual/en/function.htmlspecialchars.php).
