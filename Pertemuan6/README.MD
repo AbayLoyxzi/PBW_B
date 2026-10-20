@@ -80,12 +80,6 @@ Setelah penghapusan, baris Ari Riski tidak lagi muncul. Tabel hanya menampilkan 
 
 ![Tabel setelah penghapusan mahasiswa](screenshoot/10_hasil_hapus.png)
 
-## 4. Validasi Program
-
-Pemeriksaan sintaks menggunakan PHP pada XAMPP berhasil untuk seluruh 10 file PHP tanpa kesalahan sintaks. Pemeriksaan sumber juga menunjukkan penggunaan prepared statement untuk input pada INSERT, pencarian edit, UPDATE, dan DELETE; escaping HTML saat menampilkan data; serta validasi input pada proses penyimpanan dan perubahan.
-
-Database menetapkan NIM dan email sebagai nilai unik. Batas IPK 0–4 diterapkan pada form serta kode PHP; dump SQL tidak memiliki CHECK untuk rentang IPK. Kolom angkatan menggunakan tipe YEAR, sehingga validasi angka 1900–9999 pada PHP tidak menjamin seluruh rentang tersebut dapat disimpan oleh database.
-
 Screenshot pengguna memperlihatkan keberhasilan penambahan, penampilan, perubahan IPK, dan penghapusan data pada alur CRUD. Struktur tabel pada phpMyAdmin dan nama database `akademik_pertemuan6` sesuai dengan konfigurasi koneksi saat diperiksa. Bukti ini mencakup alur berhasil; pengujian penolakan input tidak valid, data duplikat, dan alur form dasar belum didokumentasikan dengan screenshot.
 
 Referensi penjelasan fungsi: [PHP Manual — mysqli_prepare](https://www.php.net/manual/en/mysqli.prepare.php) dan [PHP Manual — htmlspecialchars](https://www.php.net/manual/en/function.htmlspecialchars.php).
